@@ -110,8 +110,12 @@ def suggest(user, u2r, r2u, r2from, n=None, cutoff=None):
     else:
         return [x[0] for x in results[:n]]
 
-def run_suggest(users, u2r, r2u, n=10):
-    return dict( (u, suggest(u, u2r, r2u, n)) for u in users )
+def run_suggest(users, u2r, r2u, r2from, n=10, cutoff=None):
+    results = {}
+    for u in users:
+        print(u)
+        results[u] = suggest(u, u2r, r2u, r2from, n, cutoff)
+    return results
 
 def save_suggest(filename, results):
     with open(filename, 'w') as f:
