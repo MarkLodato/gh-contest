@@ -1,5 +1,8 @@
 #!/usr/bin/python
 
+from __future__ import print_function, division
+__metaclass__ = type
+
 # Copyright 2009, Mark Lodato
 #
 # August 31, 2009 and before:
