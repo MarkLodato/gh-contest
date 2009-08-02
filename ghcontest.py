@@ -110,7 +110,7 @@ def suggest(user, u2r, r2u, r2from, n=None, cutoff=None):
     else:
         return [x[0] for x in results[:n]]
 
-def run_suggest(users, u2r, r2u, r2from, n=10, cutoff=None):
+def run_suggest(users, u2r, r2u, r2from, n=10, cutoff=100):
     results = {}
     for u in users:
         print(u)
