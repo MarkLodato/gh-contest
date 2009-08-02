@@ -18,6 +18,17 @@ def read_test(filename):
     with open(filename) as f:
         return [int(x) for x in f]
 
+def read_repos(filename):
+    r2from = {}
+    with open(filename) as f:
+        for line in f:
+            r,v = line.rstrip('\n\r').split(':',1)
+            v = v.split(',')
+            if len(v) == 3:
+                name, date, forked_from = v
+                r2from[int(r)] = int(forked_from)
+    return r2from
+
 def count_sum(iterable):
     d = {}
     for k,v in iterable:
@@ -30,11 +41,21 @@ def count_sum(iterable):
 def count(iterable):
     return count_sum(itertools.izip(iterable, itertools.repeat(1)))
 
-def suggest(user, u2r, r2u, n=None, cutoff=None):
+def suggest(user, u2r, r2u, r2from, n=None, cutoff=None):
     repos = u2r[user]
+    all_repos = list(repos)
+
+    if r2from is not None:
+        for r in repos:
+            try:
+                f = r2from[r]
+            except KeyError:
+                pass
+            else:
+                all_repos.append(f)
 
     other_users = count_sum( (u,1.0)
-            for r in repos
+            for r in all_repos
             for u in r2u[r])
     other_users.pop(user, None)
 
