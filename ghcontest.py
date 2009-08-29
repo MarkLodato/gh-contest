@@ -135,7 +135,6 @@ class Suggestion:
         D = self.data.tocsc()
         r2r = D.transpose() * D
         self.common_watchers = r2r.copy()
-        r2r.data **= 1.1
 
         # Add links to parent repositories.  The weight of the parent
         # repository is equal to the weight of itself times forked_weight.
