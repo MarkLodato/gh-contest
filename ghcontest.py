@@ -168,18 +168,11 @@ class Suggestion:
     def suggest(self, u, follow_factor = 0.25, top = 10, sorted=True):
 
         watched = self.u2r[u]
-        #fork1 = watched * self.forked
-        #fork2 = fork1 * self.forked
-        #state = (watched + fork1 * .25 + fork2 * .25) * self.r2r
         state = watched * self.r2r
-        #follows = self.followers[u] * self.u2r
-        #state = ((watched * self.r2r) * (1 - follow_factor)
-        #        + follows * follow_factor)
         accumulator = state.todense()
 
         # Sort the scores, ignoring those that are already being watched.
         # Take the top results that are not already being watched.
-        #accumulator += accumulator.max() * self.watchers
         watched = self.data[u].nonzero()
         accumulator[watched] = 0
         accumulator = np.asarray(accumulator)[0]
