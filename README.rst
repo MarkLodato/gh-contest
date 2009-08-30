@@ -11,29 +11,30 @@ Introduction
 
 My algorithm is very simple, and I was surprised how well it did.  One evening
 I thought of the simplest thing I could (a naive and partial implementation of
-the Base Algorithm below) and I got 20% on my first shot, half of the leader
-at that time!  I did some tweaking and my second shot got 30%.  So, I figured
+the following) and I got 20% on my first shot, half of the leader at that
+time.  After some more tweaking, my second attempt scored 30%. So, I figured
 maybe I'd continue down this path.  My program no where near as sophisticated
-as other entires, but it is really simple and runs reasonably fast (on one CPU
-of my Core 2 Duo 6300, it takes about a minute to train and makes about 100
-suggests/sec.)
+as other entires, but it is really simple and runs reasonably fast - on one
+CPU of my Core 2 Duo 6300, it takes about a minute to train and makes about
+100 suggests/sec.
 
-The basic idea is to represent repositories as states in a Markov process.
-Start by setting with equal probability all states that the user is watching
-(the rest set to zero), step the process once, and list the 10 most likely
-states that the user is not already watching.  (If this doesn't make sense,
-read the algorithm below.  It sounds fancier than it really is.)
-
-How do you determine the probability of going from repository `i` to
-repository `j`?  Well, I got the best results by using how many users are
-watching both `i` and `j`, and then adding in information on whether `i` was
-forked from `j`.
+The basic idea is to make a graph of all the repositories, with one node per
+repository, and with edge weight A->B equal to the fraction of users watching
+A who are also watching B.  (If B is forked from A, add 1.  Let A->A = 1.)
+Then, normalize the weights so that the sum of all the edges going out of each
+node is 1.  (That is, divide each weight A->B by A->X0 + A->X1 + ... + A->Xn.)
+This results in a Markov Chain - each edge weight A->B gives the probability
+of transitioning from repository A to repository B.  Now, to make a suggestion
+for user U, assign equal probability to all repositories being watched by U,
+step the Markov Chain once (that is, perform a matrix multiply), and list the
+10 highest probability nodes, excluding those in the original set.
 
 
 Rundown
 -------
 
-The following is pseudo-code description using pseudo-NumPy syntax.
+The following is pseudo-code description using pseudo-NumPy syntax (let ~x~ be
+matrix multiply.)
 
 init()
 
@@ -42,18 +43,18 @@ init()
 
 prepare()
 
-1.  common_watchers = data.tranpose() * data  (matrix multiply)
+1.  common_watchers = data.tranpose() ~x~ data
 2.  r2r = common_watchers.copy()
 3.  for child, parent in forked: r2r[child,parent] += r2r[child,child]
-4.  r2r = common_watchers / common_watchers.sum(1)[...,newaxis]
-5.  u2r = data / data.sum(1)[...,newaxis]
+4.  r2r = divide each element of r2r by the row sum
+5.  u2r = divide each element of data by the row sum
 
-suggest(u)
+suggest(user)
 
-1.  state = u2r[u]
-2.  next = state * r2r   (matrix multiply)
-3.  for r in state.nonzero():  next[r] = 0
-4.  return next.argsort(reverse=True)
+1.  begin = u2r[user]
+2.  state = begin ~x~ r2r
+3.  state[begin != 0] = 0
+4.  return indices of 10 highest non-zero entries of state
 
 
 Base Algorithm
