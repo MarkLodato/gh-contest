@@ -16,11 +16,11 @@ time.  After some more tweaking, my second attempt scored 30%. So, I figured
 maybe I'd continue down this path.  My program no where near as sophisticated
 as other entires, but it is really simple and runs reasonably fast - on one
 CPU of my Core 2 Duo 6300, it takes about a minute to train and makes about
-100 suggests/sec.
+100 suggestions/sec.
 
 The basic idea is to make a graph of all the repositories, with one node per
 repository, and with edge weight A->B equal to the fraction of users watching
-A who are also watching B.  (If B is forked from A, add 1.  Let A->A = 1.)
+A who are also watching B.  (If A is forked from B, add 1.  Let A->A = 1.)
 Then, normalize the weights so that the sum of all the edges going out of each
 node is 1.  (That is, divide each weight A->B by A->X0 + A->X1 + ... + A->Xn.)
 This results in a Markov Chain - each edge weight A->B gives the probability
